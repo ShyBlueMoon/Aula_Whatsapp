@@ -12,11 +12,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ProjetoInstantMessaging"
         tools:targetApi="31">
-
+        <activity
+            android:name=".PerfilActivity"
+            android:parentActivityName=".MainActivity"
+            android:exported="false" />
         <activity
             android:name=".CadastroActivity"
-            android:parentActivityName=".LoginActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:parentActivityName=".LoginActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="false" />

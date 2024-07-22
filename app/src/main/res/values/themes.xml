@@ -3,7 +3,20 @@
     <style name="Base.Theme.ProjetoInstantMessaging" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/primaria</item>
+        <item name="actionOverflowButtonStyle">
+            @style/ActionOverflowButton
+        </item>
 
+
+
+    </style>
+
+    <style name="ActionOverflowButton" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="tint">@color/white</item>
+    </style>
+
+    <style name="Circulo">
+        <item name="cornerSize">50%</item>
     </style>
 
     <style name="Theme.ProjetoInstantMessaging" parent="Base.Theme.ProjetoInstantMessaging" />
