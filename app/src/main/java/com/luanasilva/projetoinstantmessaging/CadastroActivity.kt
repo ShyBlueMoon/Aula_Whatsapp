@@ -26,7 +26,7 @@ class CadastroActivity : AppCompatActivity() {
     }
     private val firestore by lazy {
             FirebaseFirestore.getInstance()
-        }
+    }
 
     private lateinit var nome: String
     private lateinit var email: String

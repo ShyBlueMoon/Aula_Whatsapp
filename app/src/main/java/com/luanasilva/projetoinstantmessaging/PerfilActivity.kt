@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.luanasilva.projetoinstantmessaging.databinding.ActivityPerfilBinding
 import com.luanasilva.projetoinstantmessaging.utils.exibirMensagem
@@ -27,6 +28,9 @@ class PerfilActivity : AppCompatActivity() {
     }
     private val storage by lazy {
         FirebaseStorage.getInstance()
+    }
+    private val firestore by lazy {
+        FirebaseFirestore.getInstance()
     }
 
 
@@ -61,7 +65,16 @@ class PerfilActivity : AppCompatActivity() {
                 .addOnSuccessListener { task ->
 
                     exibirMensagem("Sucesso ao fazer upload da imagem")
+                    task.metadata
+                        ?.reference
+                        ?.downloadUrl
+                        ?.addOnSuccessListener { url ->
 
+                            val dados = mapOf(
+                                "foto" to url.toString()
+                            )
+                            atualizarDadosPerfil(idUsuario, dados)
+                        }
 
                 }.addOnFailureListener{
 
@@ -69,6 +82,15 @@ class PerfilActivity : AppCompatActivity() {
 
                 }
         }
+    }
+
+    private fun atualizarDadosPerfil(idUsuario: String, dados: Map<String, String>) {
+
+        firestore.collection("usuarios")
+            .document(idUsuario)
+            .update(dados)
+            .addOnSuccessListener {  exibirMensagem("Sucesso ao atualizar perfil!")}
+            .addOnFailureListener{exibirMensagem("Erro ao atualizar perfil")}
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,6 +116,28 @@ class PerfilActivity : AppCompatActivity() {
                 solicitarPermissoes()
             }
         }
+
+        binding.btnAtualizarPerfil.setOnClickListener {
+
+            val nomeUsuario = binding.editNomePerfil.text.toString()
+            if(nomeUsuario.isNotEmpty()) {
+
+                val idUsuario = firebaseAuth.currentUser?.uid
+                if(idUsuario != null) {
+                    val dados = mapOf(
+                        "nome" to nomeUsuario
+                    )
+                    atualizarDadosPerfil(idUsuario, dados)
+
+                }
+
+
+            } else {
+                exibirMensagem("Preencha o nome para atualizar")
+            }
+
+        }
+
     }
 
     private fun solicitarPermissoes() {
