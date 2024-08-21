@@ -15,6 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import com.luanasilva.projetoinstantmessaging.databinding.ActivityPerfilBinding
 import com.luanasilva.projetoinstantmessaging.utils.exibirMensagem
+import com.squareup.picasso.Picasso
 
 
 class PerfilActivity : AppCompatActivity() {
@@ -105,6 +106,40 @@ class PerfilActivity : AppCompatActivity() {
         inicializarToolbar()
         solicitarPermissoes()
         inicializarEventosClique()
+    }
+
+    //on Start é normalmente utilizado para recuperar dados
+    override fun onStart() {
+        super.onStart()
+        recuperarDadosIniciaisUsuarios()
+    }
+
+    private fun recuperarDadosIniciaisUsuarios() {
+        val idUsuario = firebaseAuth.currentUser?.uid
+        if(idUsuario != null) {
+            firestore.collection("usuarios")
+                .document(idUsuario)
+                .get()
+                .addOnSuccessListener { documentSnapshot ->
+
+                    val dadosUsuarios = documentSnapshot.data
+                    if(dadosUsuarios != null) {
+                        val nome = dadosUsuarios["nome"] as String
+                        val foto = dadosUsuarios["foto"] as String
+
+                        binding.editNomePerfil.setText(nome)
+                        if(foto.isNotEmpty()) {
+
+                            Picasso.get()
+                                .load(foto)
+                                .into(binding.imagePerfil)
+
+                        }
+                    }
+
+                }
+        }
+
     }
 
     private fun inicializarEventosClique() {
