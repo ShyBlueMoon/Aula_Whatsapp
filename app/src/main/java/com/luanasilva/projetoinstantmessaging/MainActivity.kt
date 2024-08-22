@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("Cancelar") { dialog, posicao -> }
             .setPositiveButton("Sim") { dialog, posicao ->
                 firebaseAuth.signOut()
-                startActivity(Intent(applicationContext,PerfilActivity::class.java))
+                startActivity(Intent(applicationContext,LoginActivity::class.java))
             }
             .create().show()
     }
