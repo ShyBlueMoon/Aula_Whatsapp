@@ -1,4 +1,4 @@
-package com.luanasilva.projetoinstantmessaging
+package com.luanasilva.projetoinstantmessaging.activities
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -13,6 +13,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
+import com.luanasilva.projetoinstantmessaging.R
 import com.luanasilva.projetoinstantmessaging.databinding.ActivityPerfilBinding
 import com.luanasilva.projetoinstantmessaging.utils.exibirMensagem
 import com.squareup.picasso.Picasso
@@ -216,8 +217,6 @@ class PerfilActivity : AppCompatActivity() {
 
 
     }
-
-
 
 
 

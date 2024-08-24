@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:scrollbarDefaultDelayBeforeFade="0"
     android:scrollbarFadeDuration="0"
-    tools:context=".CadastroActivity">
+    tools:context=".activities.CadastroActivity">
 
 
     <include

@@ -1,4 +1,4 @@
-package com.luanasilva.projetoinstantmessaging
+package com.luanasilva.projetoinstantmessaging.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.luanasilva.projetoinstantmessaging.R
 import com.luanasilva.projetoinstantmessaging.databinding.ActivityLoginBinding
 import com.luanasilva.projetoinstantmessaging.utils.exibirMensagem
 

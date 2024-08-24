@@ -1,4 +1,4 @@
-package com.luanasilva.projetoinstantmessaging
+package com.luanasilva.projetoinstantmessaging.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,6 +13,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.firebase.auth.FirebaseAuth
+import com.luanasilva.projetoinstantmessaging.R
 import com.luanasilva.projetoinstantmessaging.adapters.ViewPageAdapter
 import com.luanasilva.projetoinstantmessaging.databinding.ActivityMainBinding
 
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("Cancelar") { dialog, posicao -> }
             .setPositiveButton("Sim") { dialog, posicao ->
                 firebaseAuth.signOut()
-                startActivity(Intent(applicationContext,LoginActivity::class.java))
+                startActivity(Intent(applicationContext, LoginActivity::class.java))
             }
             .create().show()
     }
@@ -88,7 +89,7 @@ class MainActivity : AppCompatActivity() {
                 override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                     when (menuItem.itemId) {
                         R.id.item_perfil -> {
-                            startActivity(Intent(applicationContext,PerfilActivity::class.java))
+                            startActivity(Intent(applicationContext, PerfilActivity::class.java))
                         }
                         R.id.item_sair -> {
                             deslogarUsuario()
