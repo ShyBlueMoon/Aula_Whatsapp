@@ -69,7 +69,7 @@ class ContatosFragment : Fragment() {
 
     private fun adicionarListenerContatos() {
 
-        val eventoSnapshot = firestore.collection("usuarios")
+        eventoSnapshot = firestore.collection(Constantes.USUARIOS)
             .addSnapshotListener { querySnapshot, erro ->
 
                 val listaContatos = mutableListOf<Usuario>()

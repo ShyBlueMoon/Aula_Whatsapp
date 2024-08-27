@@ -7,13 +7,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
-import com.google.firebase.storage.FirebaseStorage
 import com.luanasilva.projetoinstantmessaging.R
+import com.luanasilva.projetoinstantmessaging.adapters.MensagensAdapter
 import com.luanasilva.projetoinstantmessaging.databinding.ActivityMensagensBinding
+import com.luanasilva.projetoinstantmessaging.model.Conversa
 import com.luanasilva.projetoinstantmessaging.model.Mensagem
 import com.luanasilva.projetoinstantmessaging.model.Usuario
 import com.luanasilva.projetoinstantmessaging.utils.Constantes
@@ -25,20 +27,19 @@ class MensagensActivity : AppCompatActivity() {
     private val binding by lazy {
         ActivityMensagensBinding.inflate(layoutInflater)
     }
-    private var dadosDestinatario: Usuario? = null
 
     private val firebaseAuth by lazy {
         FirebaseAuth.getInstance()
     }
-    private val storage by lazy {
-        FirebaseStorage.getInstance()
-    }
+
     private val firestore by lazy {
         FirebaseFirestore.getInstance()
     }
 
     private lateinit var listenerRegistration: ListenerRegistration
-
+    private var dadosDestinatario: Usuario? = null
+    private var dadosUsuarioRemetente: Usuario? = null
+    private lateinit var mensagensAdapter: MensagensAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,10 +52,19 @@ class MensagensActivity : AppCompatActivity() {
             insets
         }
 
-        recuperarDadosUsuarioDestinatario()
+        recuperarDadosUsuarios()
         inicializarToolbar()
         inicializarEventosClique()
+        inicializarRecyclerView()
         inicializarListeners()
+    }
+
+    private fun inicializarRecyclerView() {
+        with(binding) {
+            mensagensAdapter = MensagensAdapter()
+            rvMensagens.adapter = mensagensAdapter
+            rvMensagens.layoutManager = LinearLayoutManager(applicationContext)
+        }
     }
 
     override fun onDestroy() {
@@ -67,7 +77,7 @@ class MensagensActivity : AppCompatActivity() {
         val idUsuarioDestinatario = dadosDestinatario?.id
         if(idUsuarioRemetente != null && idUsuarioDestinatario != null ) {
 
-            val listenerRegistration = firestore
+            listenerRegistration = firestore
                 .collection(Constantes.MENSAGENS)
                 .document(idUsuarioRemetente)
                 .collection(idUsuarioDestinatario)
@@ -92,6 +102,7 @@ class MensagensActivity : AppCompatActivity() {
                     //Lista
                     if(listaMensagens.isNotEmpty()) {
                         //Carregar dados adapter
+                        mensagensAdapter.adicionarLista(listaMensagens)
                     }
 
                 }
@@ -114,19 +125,53 @@ class MensagensActivity : AppCompatActivity() {
                 val mensagem = Mensagem(
                     idUsuarioRemetente,textoMensagem
                 )
+
+
+
+
                 //Salvar para o remetente
                 salvarMensagemFirestore(
                     idUsuarioRemetente,idUsuarioDestinatario,mensagem
                 )
+
+                val conversaRemetente = Conversa(
+                    idUsuarioRemetente, idUsuarioDestinatario,
+                    dadosDestinatario!!.foto, dadosDestinatario!!.nome,
+                    textoMensagem
+                )
+
+                salvarConversaFirestore(conversaRemetente)
+
                 //Salvar para o destinatario
                 salvarMensagemFirestore(
                     idUsuarioDestinatario,idUsuarioRemetente,mensagem
                 )
 
+                val conversaDestinatario = Conversa(
+                    idUsuarioDestinatario, idUsuarioRemetente,
+                    dadosUsuarioRemetente!!.foto, dadosUsuarioRemetente!!.nome,
+                    textoMensagem
+                )
+                salvarConversaFirestore(conversaDestinatario)
+
                 binding.editMensagens.setText("")
 
             }
         }
+    }
+
+    private fun salvarConversaFirestore(conversa: Conversa) {
+
+        firestore
+            .collection(Constantes.CONVERSAS)
+            .document(conversa.idUsuarioRemetente)
+            .collection(Constantes.ULTIMAS_CONVERSAS)
+            .document(conversa.idUsuarioDestinatario)
+            .set(conversa)
+            .addOnFailureListener {
+                exibirMensagem("Erro ao salvar conversa")
+            }
+
     }
 
     private fun salvarMensagemFirestore(
@@ -157,23 +202,33 @@ class MensagensActivity : AppCompatActivity() {
         }
     }
 
-    private fun recuperarDadosUsuarioDestinatario() {
+    private fun recuperarDadosUsuarios() {
+        //Dados usuario logado
+        val idUsuarioRemetente =  firebaseAuth.currentUser?.uid
+        if(idUsuarioRemetente != null) {
+            firestore
+                .collection(Constantes.USUARIOS)
+                .document(idUsuarioRemetente)
+                .get()
+                .addOnSuccessListener { documentSnapshot ->
+                    val usuario = documentSnapshot.toObject(Usuario::class.java)
+                    if(usuario != null) {
+                        dadosUsuarioRemetente = usuario
+                    }
+                }
+        }
+
+
+        //Recuperando dados destinatario
         val extras = intent.extras
         if(extras != null) {
 
-            val origem = extras.getString("origem")
-            if (origem == Constantes.ORIGEM_CONTATO) {
+            //val origem = extras.getString("origem")
+            dadosDestinatario = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                extras.getParcelable("dadosDestinatario", Usuario::class.java)
 
-                dadosDestinatario = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    extras.getParcelable("dadosDestinatario", Usuario::class.java)
-
-                } else {
-                    extras.getParcelable("dadosDestinatario")
-                }
-
-
-            } else if (origem == Constantes.ORIGEM_CONVERSA) {
-
+            } else {
+                extras.getParcelable("dadosDestinatario")
             }
 
         }
